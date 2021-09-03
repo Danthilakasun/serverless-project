@@ -35,7 +35,7 @@ provider:
       Action:
         - dynamodb:*
       Resource:
-        - arn:aws:dynamodb:ap-south-1:087637206114:table/ServerlessUserTable
+        - arn:aws:dynamodb:ap-south-1:087637206114:table/UserTable
 #        - "s3:ListBucket"
 #      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
 #    - Effect: "Allow"
@@ -62,17 +62,23 @@ provider:
 
 functions:
   userReg:
-    handler: src/userReg.handler
+    handler: src/user.userReg
     events:
       - http:
-          path: /user/create
-          method: post
+          path: /create
+          method: POST
   userLogin:
-    handler: src/userLogin.handler
+    handler: src/user.userLogin
     events:
       - http:
           path: /login
-          method: get
+          method: POST
+  fetchAllUsers:
+    handler: src/user.fetchAllUsers
+    events:
+      - http:
+          path: /allUsers
+          method: GET
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
@@ -112,12 +118,12 @@ resources:
     UserRegistration:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ServerlessUserTable
+        TableName: UserTable
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: username
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: username
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
